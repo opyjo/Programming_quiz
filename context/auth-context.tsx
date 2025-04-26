@@ -43,9 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  console.log("Supabase URL:", config.supabase.url);
-  console.log("Supabase Anon Key:", config.supabase.anonKey);
-
   const [supabase] = useState(() =>
     createBrowserClient(config.supabase.url, config.supabase.anonKey)
   );
@@ -80,6 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             avatar_url: session.user.user_metadata.avatar_url,
             provider: session.user.app_metadata.provider,
           });
+          // Redirect to home page on successful sign in
+          if (event === "SIGNED_IN") {
+            router.push("/");
+          }
         } else {
           setUser(null);
         }
@@ -90,14 +91,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, [supabase.auth, router]);
 
   const signIn = async (provider: "github" | "google") => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}`,
         },
       });
       if (error) throw error;
@@ -108,11 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
+      if (data.session) {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Error signing in:", error);
       throw error;
@@ -125,17 +129,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name: string
   ) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: name,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       if (error) throw error;
+
+      // Since email confirmation is disabled, user should be authenticated immediately
+      if (data.session) {
+        setUser({
+          id: data.user!.id,
+          email: data.user!.email!,
+          name: name,
+          avatar_url: data.user?.user_metadata.avatar_url,
+          provider: "email",
+        });
+        router.push("/");
+      }
     } catch (error) {
       console.error("Error signing up:", error);
       throw error;
