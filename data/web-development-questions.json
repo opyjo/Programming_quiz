@@ -1,0 +1,186 @@
+[
+  {
+    "id": "web-dev-1",
+    "text": "What is the difference between 'let', 'const', and 'var' in JavaScript?",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-2",
+    "text": "Explain the concept of the CSS Box Model.",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-3",
+    "text": "What is the purpose of the 'async' and 'await' keywords in JavaScript?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-4",
+    "text": "Describe the difference between 'localStorage' and 'sessionStorage' in web browsers.",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-5",
+    "text": "What is a Promise in JavaScript and how does it work?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-6",
+    "text": "Explain the concept of React hooks and give examples of commonly used hooks.",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-7",
+    "text": "What is the Virtual DOM in React and why is it important?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-8",
+    "text": "Describe the difference between 'null' and 'undefined' in JavaScript.",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-9",
+    "text": "What is CORS (Cross-Origin Resource Sharing) and why is it important?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-10",
+    "text": "Explain the concept of closures in JavaScript with an example.",
+    "difficulty": "Intermediate",
+    "category": "web-development",
+    "code": "function createCounter() {\n  let count = 0;\n  return function() {\n    count += 1;\n    return count;\n  };\n}\n\nconst counter = createCounter();\nconsole.log(counter()); // ?\nconsole.log(counter()); // ?"
+  },
+  {
+    "id": "web-dev-11",
+    "text": "What is the difference between 'em' and 'rem' units in CSS?",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-12",
+    "text": "Explain the concept of CSS Grid and how it differs from Flexbox.",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-13",
+    "text": "What is event delegation in JavaScript and why is it useful?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-14",
+    "text": "Describe the difference between 'call', 'apply', and 'bind' methods in JavaScript.",
+    "difficulty": "Advanced",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-15",
+    "text": "What are Web Components and what problem do they solve?",
+    "difficulty": "Advanced",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-16",
+    "text": "Explain the concept of server-side rendering (SSR) and its benefits.",
+    "difficulty": "Advanced",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-17",
+    "text": "What is the difference between HTTP and HTTPS?",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-18",
+    "text": "Explain the concept of Progressive Web Apps (PWAs).",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-19",
+    "text": "What is the purpose of the 'this' keyword in JavaScript?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-20",
+    "text": "Describe the difference between 'shallow' and 'deep' copying of objects in JavaScript.",
+    "difficulty": "Advanced",
+    "category": "web-development",
+    "code": "const original = { a: 1, b: { c: 2 } };\n\n// Shallow copy\nconst shallowCopy = { ...original };\nshallowCopy.b.c = 3;\n\n// Deep copy\nconst deepCopy = JSON.parse(JSON.stringify(original));\ndeepCopy.b.c = 4;\n\nconsole.log(original.b.c); // ?"
+  },
+  {
+    "id": "web-dev-21",
+    "text": "What is the difference between 'map', 'filter', and 'reduce' array methods in JavaScript?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-22",
+    "text": "Explain the concept of CSS specificity and how it affects styling.",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-23",
+    "text": "What are Web APIs and give examples of commonly used ones.",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-24",
+    "text": "Describe the difference between 'GET' and 'POST' HTTP methods.",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-25",
+    "text": "What is the purpose of the 'useEffect' hook in React?",
+    "difficulty": "Intermediate",
+    "category": "web-development",
+    "code": "import React, { useState, useEffect } from 'react';\n\nfunction Timer() {\n  const [count, setCount] = useState(0);\n\n  useEffect(() => {\n    const timer = setInterval(() => {\n      setCount(prevCount => prevCount + 1);\n    }, 1000);\n\n    return () => clearInterval(timer);\n  }, []);\n\n  return <div>Count: {count}</div>;\n}"
+  },
+  {
+    "id": "web-dev-26",
+    "text": "What is the purpose of the 'DOCTYPE' declaration in HTML?",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-27",
+    "text": "Explain the concept of responsive web design.",
+    "difficulty": "Beginner",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-28",
+    "text": "What is the difference between 'position: relative', 'position: absolute', and 'position: fixed' in CSS?",
+    "difficulty": "Intermediate",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-29",
+    "text": "Explain the concept of event bubbling and capturing in JavaScript.",
+    "difficulty": "Advanced",
+    "category": "web-development"
+  },
+  {
+    "id": "web-dev-30",
+    "text": "What is the purpose of the 'key' prop in React lists?",
+    "difficulty": "Intermediate",
+    "category": "web-development",
+    "code": "function TodoList({ todos }) {\n  return (\n    <ul>\n      {todos.map(todo => (\n        <li key={todo.id}>{todo.text}</li>\n      ))}\n    </ul>\n  );\n}"
+  }
+]
