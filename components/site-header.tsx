@@ -36,6 +36,23 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
+type SubNavItem = {
+  name: string;
+  href: string;
+};
+
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  hoverColor: string;
+  active?: boolean;
+  dropdown?: boolean;
+  items?: SubNavItem[];
+};
+
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
@@ -106,72 +123,30 @@ export function SiteHeader() {
   };
 
   // Navigation items
-  const navItems = [
+  const navItems: NavItem[] = [
     {
       name: "Home",
       href: "/",
-      icon: <Home className="h-4 w-4 mr-2" />,
-      active: pathname === "/",
+      icon: <Frame className="h-4 w-4" />,
+      color: "text-blue-500 dark:text-blue-400",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
+      hoverColor: "hover:text-blue-600 dark:hover:text-blue-300",
     },
     {
-      name: "Quizzes",
+      name: "Quiz",
       href: "/quiz",
-      icon: <BookOpen className="h-4 w-4 mr-2" />,
-      active: pathname.startsWith("/quiz"),
-      dropdown: true,
-      items: [
-        { name: "All Categories", href: "/quiz" },
-        { name: "Web Development", href: "/quiz/web-development" },
-        { name: "Python", href: "/quiz/python" },
-        { name: "Golang", href: "/quiz/golang" },
-        { name: "Java", href: "/quiz/java" },
-      ],
-    },
-    {
-      name: "Resources",
-      href: "/resources",
-      icon: <BookOpen className="h-4 w-4 mr-2" />,
-      active: pathname === "/resources",
-    },
-    {
-      name: "About",
-      href: "/about",
-      icon: <Info className="h-4 w-4 mr-2" />,
-      active: pathname === "/about",
-    },
-    {
-      name: "FAQ",
-      href: "/faq",
-      icon: <HelpCircle className="h-4 w-4 mr-2" />,
-      active: pathname === "/faq",
+      icon: <Menu className="h-4 w-4" />,
+      color: "text-green-500 dark:text-green-400",
+      bgColor: "bg-green-100 dark:bg-green-900/20",
+      hoverColor: "hover:text-green-600 dark:hover:text-green-300",
     },
     {
       name: "Contact",
       href: "/contact",
-      icon: <Mail className="h-4 w-4 mr-2" />,
-      active: pathname === "/contact",
-    },
-  ];
-
-  // User-specific navigation items (only shown when logged in)
-  const userNavItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: <BarChart2 className="h-4 w-4 mr-2" />,
-      active: pathname === "/dashboard",
-    },
-    {
-      name: "Bookmarks",
-      href: "/bookmarks",
-      icon: <Bookmark className="h-4 w-4 mr-2" />,
-      active: pathname === "/bookmarks",
-    },
-    {
-      name: "History",
-      href: "/history",
-      icon: <History className="h-4 w-4 mr-2" />,
-      active: pathname === "/history",
+      icon: <Mail className="h-4 w-4" />,
+      color: "text-emerald-500 dark:text-emerald-400",
+      bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
+      hoverColor: "hover:text-emerald-600 dark:hover:text-emerald-300",
     },
   ];
 
@@ -179,9 +154,11 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 flex">
-          <Link href="/" className="flex items-center space-x-2">
-            <Frame className="h-6 w-6" />
-            <span className="font-bold">Programming Quiz</span>
+          <Link href="/" className="flex items-center space-x-2 group">
+            <Frame className="h-6 w-6 transition-transform duration-300 group-hover:rotate-180 text-blue-500" />
+            <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-violet-500">
+              Programming Quiz
+            </span>
           </Link>
         </div>
 
@@ -195,18 +172,34 @@ export function SiteHeader() {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "flex items-center px-2 py-1.5 text-sm font-medium transition-colors hover:text-primary",
-                        item.active ? "text-foreground" : "text-foreground/60"
+                        "flex items-center px-2 py-1.5 text-sm font-medium transition-all duration-300 ease-in-out transform hover:scale-105",
+                        item.active ? item.color : "text-foreground/60",
+                        item.hoverColor
                       )}
                     >
-                      {item.name}
-                      <ChevronDown className="ml-1 h-4 w-4" />
+                      <span className="flex items-center">
+                        <span
+                          className={cn("p-1 rounded-md mr-1", item.bgColor)}
+                        >
+                          {item.icon}
+                        </span>
+                        {item.name}
+                      </span>
+                      <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
+                  <DropdownMenuContent
+                    align="start"
+                    className="animate-in slide-in-from-top-2"
+                  >
                     {item.items?.map((subItem) => (
                       <DropdownMenuItem key={subItem.name} asChild>
-                        <Link href={subItem.href}>{subItem.name}</Link>
+                        <Link
+                          href={subItem.href}
+                          className="flex items-center transition-colors duration-200 hover:text-violet-500"
+                        >
+                          {subItem.name}
+                        </Link>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -216,34 +209,21 @@ export function SiteHeader() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    item.active ? "text-foreground" : "text-foreground/60"
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105",
+                    item.active ? item.color : "text-foreground/60",
+                    item.hoverColor
                   )}
                 >
-                  {item.name}
+                  <span className={cn("p-1 rounded-md", item.bgColor)}>
+                    {item.icon}
+                  </span>
+                  <span>{item.name}</span>
                 </Link>
               )
             )}
           </nav>
 
           <div className="flex items-center space-x-4">
-            {mounted && isAuthenticated && (
-              <nav className="flex items-center space-x-4">
-                {userNavItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "text-sm font-medium transition-colors hover:text-primary",
-                      item.active ? "text-foreground" : "text-foreground/60"
-                    )}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
-            )}
-
             <ModeToggle />
 
             {mounted && (
@@ -253,26 +233,37 @@ export function SiteHeader() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="relative h-8 w-8 rounded-full"
+                        className="relative h-8 w-8 rounded-full transition-transform duration-200 hover:scale-110"
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                            {getUserInitials()}
+                          </AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent
+                      align="end"
+                      className="animate-in slide-in-from-top-2"
+                    >
                       <DropdownMenuLabel className="flex items-center gap-2">
                         My Account
                         {getProviderIcon()}
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/profile">
+                        <Link
+                          href="/profile"
+                          className="flex items-center transition-colors duration-200 hover:text-blue-500"
+                        >
                           <User className="mr-2 h-4 w-4" />
                           <span>Profile</span>
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleLogout}>
+                      <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="transition-colors duration-200 hover:text-red-500"
+                      >
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
                       </DropdownMenuItem>
@@ -281,12 +272,21 @@ export function SiteHeader() {
                 ) : (
                   <div className="flex items-center space-x-2">
                     <Link href="/auth/sign-in">
-                      <Button variant="ghost" size="sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="transition-all duration-200 hover:text-blue-500 hover:scale-105"
+                      >
                         Sign In
                       </Button>
                     </Link>
                     <Link href="/auth/sign-up">
-                      <Button size="sm">Sign Up</Button>
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
+                      >
+                        Sign Up
+                      </Button>
                     </Link>
                   </div>
                 )}
@@ -304,12 +304,12 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="ml-2 p-1.5 relative"
+                className="ml-2 p-1.5 relative transition-transform duration-200 hover:scale-110"
               >
                 <span className="sr-only">Toggle menu</span>
                 <Menu className="h-5 w-5" />
                 {isAuthenticated && (
-                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary" />
+                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-violet-500" />
                 )}
               </Button>
             </SheetTrigger>
@@ -318,14 +318,20 @@ export function SiteHeader() {
                 <div className="border-b p-4 flex items-center justify-between">
                   <Link
                     href="/"
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 group"
                     onClick={() => setIsOpen(false)}
                   >
-                    <Frame className="h-6 w-6" />
-                    <span className="font-bold">Programming Quiz</span>
+                    <Frame className="h-6 w-6 transition-transform duration-300 group-hover:rotate-180 text-blue-500" />
+                    <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-violet-500">
+                      Programming Quiz
+                    </span>
                   </Link>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 transition-transform duration-200 hover:scale-110"
+                    >
                       <X className="h-4 w-4" />
                       <span className="sr-only">Close</span>
                     </Button>
@@ -337,7 +343,13 @@ export function SiteHeader() {
                     {navItems.map((item) =>
                       item.dropdown ? (
                         <div key={item.name} className="px-2 py-1">
-                          <div className="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-muted">
+                          <div
+                            className={cn(
+                              "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                              item.color,
+                              item.bgColor
+                            )}
+                          >
                             {item.icon}
                             {item.name}
                           </div>
@@ -346,7 +358,7 @@ export function SiteHeader() {
                               <Link
                                 key={subItem.name}
                                 href={subItem.href}
-                                className="flex px-3 py-2 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                className="flex px-3 py-2 text-sm rounded-md text-muted-foreground hover:text-violet-500 transition-colors duration-200"
                                 onClick={() => setIsOpen(false)}
                               >
                                 {subItem.name}
@@ -359,10 +371,11 @@ export function SiteHeader() {
                           key={item.name}
                           href={item.href}
                           className={cn(
-                            "flex items-center px-3 py-2 mx-2 text-sm font-medium rounded-md hover:bg-muted/50",
-                            item.active
-                              ? "bg-muted text-foreground"
-                              : "text-muted-foreground hover:text-foreground"
+                            "flex items-center px-3 py-2 mx-2 text-sm font-medium rounded-md transition-all duration-200",
+                            item.active ? item.color : "text-muted-foreground",
+                            item.hoverColor,
+                            item.bgColor,
+                            "hover:scale-105"
                           )}
                           onClick={() => setIsOpen(false)}
                         >
@@ -370,30 +383,6 @@ export function SiteHeader() {
                           {item.name}
                         </Link>
                       )
-                    )}
-
-                    {mounted && isAuthenticated && (
-                      <>
-                        <div className="px-2 py-2">
-                          <Separator />
-                        </div>
-                        {userNavItems.map((item) => (
-                          <Link
-                            key={item.name}
-                            href={item.href}
-                            className={cn(
-                              "flex items-center px-3 py-2 mx-2 text-sm font-medium rounded-md hover:bg-muted/50",
-                              item.active
-                                ? "bg-muted text-foreground"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {item.icon}
-                            {item.name}
-                          </Link>
-                        ))}
-                      </>
                     )}
                   </nav>
                 </div>
@@ -405,7 +394,7 @@ export function SiteHeader() {
                         <div className="flex flex-col space-y-4">
                           <div className="flex items-center space-x-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarFallback>
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-white">
                                 {getUserInitials()}
                               </AvatarFallback>
                             </Avatar>
@@ -429,13 +418,16 @@ export function SiteHeader() {
                               className="flex-1"
                               onClick={() => setIsOpen(false)}
                             >
-                              <Button variant="outline" className="w-full">
+                              <Button
+                                variant="outline"
+                                className="w-full transition-all duration-200 hover:text-blue-500 hover:scale-105"
+                              >
                                 Profile
                               </Button>
                             </Link>
                             <Button
                               variant="default"
-                              className="flex-1"
+                              className="flex-1 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
                               onClick={handleLogout}
                             >
                               Log out
@@ -449,7 +441,10 @@ export function SiteHeader() {
                             className="flex-1"
                             onClick={() => setIsOpen(false)}
                           >
-                            <Button variant="outline" className="w-full">
+                            <Button
+                              variant="outline"
+                              className="w-full transition-all duration-200 hover:text-blue-500 hover:scale-105"
+                            >
                               Sign In
                             </Button>
                           </Link>
@@ -458,7 +453,10 @@ export function SiteHeader() {
                             className="flex-1"
                             onClick={() => setIsOpen(false)}
                           >
-                            <Button variant="default" className="w-full">
+                            <Button
+                              variant="default"
+                              className="w-full bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
+                            >
                               Sign Up
                             </Button>
                           </Link>

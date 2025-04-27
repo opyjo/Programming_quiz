@@ -589,11 +589,6 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about" className="hover:underline">
-                    About Us
-                  </Link>
-                </li>
-                <li>
                   <Link href="/contact" className="hover:underline">
                     Contact
                   </Link>
