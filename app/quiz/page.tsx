@@ -1,6 +1,6 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/protected-route";
+import ProtectedRoute from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import {
   Card,

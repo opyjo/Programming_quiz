@@ -2,24 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  Frame,
-  User,
-  LogOut,
-  Menu,
-  Home,
-  BookOpen,
-  Award,
-  BarChart2,
-  HelpCircle,
-  Mail,
-  Info,
-  Bookmark,
-  History,
-  ChevronDown,
-  X,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Frame, User, LogOut, Menu, ChevronDown, X, Mail } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,9 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type SubNavItem = {
   name: string;
@@ -55,10 +39,10 @@ type NavItem = {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, isAuthenticated, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   // Fix hydration issues
   useEffect(() => {
@@ -122,6 +106,12 @@ export function SiteHeader() {
     }
   };
 
+  // Check if a nav item is active
+  const isNavItemActive = (href: string) => {
+    if (href === "/" && pathname !== "/") return false;
+    return pathname.startsWith(href);
+  };
+
   // Navigation items
   const navItems: NavItem[] = [
     {
@@ -131,6 +121,7 @@ export function SiteHeader() {
       color: "text-blue-500 dark:text-blue-400",
       bgColor: "bg-blue-100 dark:bg-blue-900/20",
       hoverColor: "hover:text-blue-600 dark:hover:text-blue-300",
+      active: pathname === "/",
     },
     {
       name: "Quiz",
@@ -139,6 +130,26 @@ export function SiteHeader() {
       color: "text-green-500 dark:text-green-400",
       bgColor: "bg-green-100 dark:bg-green-900/20",
       hoverColor: "hover:text-green-600 dark:hover:text-green-300",
+      dropdown: true,
+      active: pathname.startsWith("/quiz"),
+      items: [
+        {
+          name: "Web Development",
+          href: "/quiz/web-development",
+        },
+        {
+          name: "Python",
+          href: "/quiz/python",
+        },
+        {
+          name: "Java",
+          href: "/quiz/java",
+        },
+        {
+          name: "Golang",
+          href: "/quiz/golang",
+        },
+      ],
     },
     {
       name: "Contact",
@@ -147,15 +158,46 @@ export function SiteHeader() {
       color: "text-emerald-500 dark:text-emerald-400",
       bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
       hoverColor: "hover:text-emerald-600 dark:hover:text-emerald-300",
+      active: pathname === "/contact",
     },
   ];
+
+  const logoAnimation = {
+    hover: { rotate: 360, transition: { duration: 0.6, ease: "easeInOut" } },
+  };
+
+  const dropdownVariants = {
+    hidden: { opacity: 0, y: -5, height: 0 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -5,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeIn",
+      },
+    },
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 flex">
           <Link href="/" className="flex items-center space-x-2 group">
-            <Frame className="h-6 w-6 transition-transform duration-300 group-hover:rotate-180 text-blue-500" />
+            <motion.div whileHover="hover" animate={{ rotate: 0 }}>
+              <motion.div variants={logoAnimation}>
+                <Frame className="h-6 w-6 text-blue-500" />
+              </motion.div>
+            </motion.div>
             <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-violet-500">
               Programming Quiz
             </span>
@@ -164,61 +206,100 @@ export function SiteHeader() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex flex-1 items-center justify-between space-x-4">
-          <nav className="flex items-center space-x-6">
+          <nav className="flex items-center space-x-1">
             {navItems.map((item) =>
               item.dropdown ? (
-                <DropdownMenu key={item.name}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
+                <div
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={() => setActiveDropdown(item.name)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300",
+                      item.active ? item.color : "text-foreground/70",
+                      item.hoverColor,
+                      "hover:bg-accent"
+                    )}
+                  >
+                    <span
                       className={cn(
-                        "flex items-center px-2 py-1.5 text-sm font-medium transition-all duration-300 ease-in-out transform hover:scale-105",
-                        item.active ? item.color : "text-foreground/60",
-                        item.hoverColor
+                        "p-1.5 rounded-md mr-2",
+                        item.active ? item.bgColor : "bg-transparent"
                       )}
                     >
-                      <span className="flex items-center">
-                        <span
-                          className={cn("p-1 rounded-md mr-1", item.bgColor)}
-                        >
-                          {item.icon}
-                        </span>
-                        {item.name}
-                      </span>
-                      <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="animate-in slide-in-from-top-2"
-                  >
-                    {item.items?.map((subItem) => (
-                      <DropdownMenuItem key={subItem.name} asChild>
-                        <Link
-                          href={subItem.href}
-                          className="flex items-center transition-colors duration-200 hover:text-violet-500"
-                        >
-                          {subItem.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
+                    <ChevronDown
+                      className={cn(
+                        "ml-1 h-4 w-4 transition-transform duration-300",
+                        activeDropdown === item.name ? "rotate-180" : "rotate-0"
+                      )}
+                    />
+                  </Button>
+
+                  <AnimatePresence>
+                    {activeDropdown === item.name && (
+                      <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={dropdownVariants}
+                        className="absolute left-0 mt-1 w-48 origin-top-left rounded-md bg-popover shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden"
+                      >
+                        <div className="py-1">
+                          {item.items?.map((subItem) => {
+                            const isActive = pathname === subItem.href;
+                            return (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className={cn(
+                                  "block px-4 py-2 text-sm transition-colors duration-200",
+                                  isActive
+                                    ? "bg-accent text-accent-foreground font-medium"
+                                    : "text-foreground/70 hover:bg-accent hover:text-accent-foreground"
+                                )}
+                              >
+                                {subItem.name}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
-                <Link
+                <motion.div
                   key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105",
-                    item.active ? item.color : "text-foreground/60",
-                    item.hoverColor
-                  )}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <span className={cn("p-1 rounded-md", item.bgColor)}>
-                    {item.icon}
-                  </span>
-                  <span>{item.name}</span>
-                </Link>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+                      item.active
+                        ? `${item.color} ${item.bgColor} bg-opacity-20`
+                        : "text-foreground/70 hover:bg-accent",
+                      item.hoverColor
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "p-1.5 rounded-md mr-2",
+                        item.active ? item.bgColor : "bg-transparent"
+                      )}
+                    >
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
+                  </Link>
+                </motion.div>
               )
             )}
           </nav>
@@ -231,27 +312,36 @@ export function SiteHeader() {
                 {isAuthenticated ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="relative h-8 w-8 rounded-full transition-transform duration-200 hover:scale-110"
-                      >
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-white">
-                            {getUserInitials()}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
+                      <motion.div whileHover={{ scale: 1.05 }}>
+                        <Button
+                          variant="ghost"
+                          className="relative h-9 w-9 rounded-full border border-primary/10 bg-gradient-to-br from-background to-background/80"
+                        >
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                              {getUserInitials()}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Button>
+                      </motion.div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="animate-in slide-in-from-top-2"
+                      className="w-56 animate-in slide-in-from-top-2"
                     >
-                      <DropdownMenuLabel className="flex items-center gap-2">
-                        My Account
+                      <DropdownMenuLabel className="flex items-center gap-2 font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user?.email || ""}
+                          </p>
+                        </div>
                         {getProviderIcon()}
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild className="cursor-pointer">
                         <Link
                           href="/profile"
                           className="flex items-center transition-colors duration-200 hover:text-blue-500"
@@ -260,9 +350,10 @@ export function SiteHeader() {
                           <span>Profile</span>
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={handleLogout}
-                        className="transition-colors duration-200 hover:text-red-500"
+                        className="cursor-pointer transition-colors duration-200 hover:text-red-500"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
@@ -271,23 +362,27 @@ export function SiteHeader() {
                   </DropdownMenu>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <Link href="/auth/sign-in">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="transition-all duration-200 hover:text-blue-500 hover:scale-105"
-                      >
-                        Sign In
-                      </Button>
-                    </Link>
-                    <Link href="/auth/sign-up">
-                      <Button
-                        size="sm"
-                        className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
-                      >
-                        Sign Up
-                      </Button>
-                    </Link>
+                    <motion.div whileHover={{ scale: 1.05 }}>
+                      <Link href="/auth/sign-in">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="transition-colors duration-200 hover:text-blue-500"
+                        >
+                          Sign In
+                        </Button>
+                      </Link>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }}>
+                      <Link href="/auth/sign-up">
+                        <Button
+                          size="sm"
+                          className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-colors duration-200"
+                        >
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </motion.div>
                   </div>
                 )}
               </>
@@ -338,32 +433,46 @@ export function SiteHeader() {
                   </SheetTrigger>
                 </div>
 
-                <div className="flex-1 overflow-auto py-2">
-                  <nav className="flex flex-col space-y-1">
+                <div className="flex-1 overflow-auto py-4">
+                  <nav className="flex flex-col space-y-3">
                     {navItems.map((item) =>
                       item.dropdown ? (
-                        <div key={item.name} className="px-2 py-1">
+                        <div key={item.name} className="px-4">
                           <div
                             className={cn(
-                              "flex items-center px-3 py-2 text-sm font-medium rounded-md",
-                              item.color,
-                              item.bgColor
+                              "flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                              item.active
+                                ? `${item.color} ${item.bgColor}`
+                                : "bg-accent/50",
+                              "mb-2"
                             )}
                           >
-                            {item.icon}
-                            {item.name}
+                            <div className="flex items-center">
+                              <span className="p-1 rounded-md mr-2">
+                                {item.icon}
+                              </span>
+                              <span>{item.name}</span>
+                            </div>
                           </div>
-                          <div className="mt-1 pl-5 space-y-1">
-                            {item.items?.map((subItem) => (
-                              <Link
-                                key={subItem.name}
-                                href={subItem.href}
-                                className="flex px-3 py-2 text-sm rounded-md text-muted-foreground hover:text-violet-500 transition-colors duration-200"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {subItem.name}
-                              </Link>
-                            ))}
+                          <div className="ml-4 border-l-2 border-muted pl-4 space-y-1">
+                            {item.items?.map((subItem) => {
+                              const isActive = pathname === subItem.href;
+                              return (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className={cn(
+                                    "flex px-3 py-2 text-sm rounded-md transition-colors duration-200",
+                                    isActive
+                                      ? "font-medium text-primary bg-primary/10"
+                                      : "text-muted-foreground hover:text-primary hover:bg-accent"
+                                  )}
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              );
+                            })}
                           </div>
                         </div>
                       ) : (
@@ -371,16 +480,18 @@ export function SiteHeader() {
                           key={item.name}
                           href={item.href}
                           className={cn(
-                            "flex items-center px-3 py-2 mx-2 text-sm font-medium rounded-md transition-all duration-200",
-                            item.active ? item.color : "text-muted-foreground",
-                            item.hoverColor,
-                            item.bgColor,
-                            "hover:scale-105"
+                            "flex items-center px-3 py-2 mx-4 text-sm font-medium rounded-md transition-all duration-200",
+                            item.active
+                              ? `${item.color} ${item.bgColor}`
+                              : "text-foreground/70 hover:bg-accent",
+                            "hover:translate-x-1"
                           )}
                           onClick={() => setIsOpen(false)}
                         >
-                          {item.icon}
-                          {item.name}
+                          <span className="p-1 rounded-md mr-2">
+                            {item.icon}
+                          </span>
+                          <span>{item.name}</span>
                         </Link>
                       )
                     )}
@@ -392,8 +503,8 @@ export function SiteHeader() {
                     <>
                       {isAuthenticated ? (
                         <div className="flex flex-col space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="h-10 w-10">
+                          <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                            <Avatar className="h-10 w-10 border-2 border-background">
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-white">
                                 {getUserInitials()}
                               </AvatarFallback>
@@ -420,16 +531,18 @@ export function SiteHeader() {
                             >
                               <Button
                                 variant="outline"
-                                className="w-full transition-all duration-200 hover:text-blue-500 hover:scale-105"
+                                className="w-full transition-all duration-200 hover:text-blue-500"
                               >
+                                <User className="mr-2 h-4 w-4" />
                                 Profile
                               </Button>
                             </Link>
                             <Button
                               variant="default"
-                              className="flex-1 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
+                              className="flex-1 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600"
                               onClick={handleLogout}
                             >
+                              <LogOut className="mr-2 h-4 w-4" />
                               Log out
                             </Button>
                           </div>
@@ -443,7 +556,7 @@ export function SiteHeader() {
                           >
                             <Button
                               variant="outline"
-                              className="w-full transition-all duration-200 hover:text-blue-500 hover:scale-105"
+                              className="w-full transition-all duration-200 hover:text-blue-500"
                             >
                               Sign In
                             </Button>
@@ -455,7 +568,7 @@ export function SiteHeader() {
                           >
                             <Button
                               variant="default"
-                              className="w-full bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 transition-all duration-200 hover:scale-105"
+                              className="w-full bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600"
                             >
                               Sign Up
                             </Button>
