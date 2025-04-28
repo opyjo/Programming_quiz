@@ -130,26 +130,7 @@ export function SiteHeader() {
       color: "text-green-500 dark:text-green-400",
       bgColor: "bg-green-100 dark:bg-green-900/20",
       hoverColor: "hover:text-green-600 dark:hover:text-green-300",
-      dropdown: true,
       active: pathname.startsWith("/quiz"),
-      items: [
-        {
-          name: "Web Development",
-          href: "/quiz/web-development",
-        },
-        {
-          name: "Python",
-          href: "/quiz/python",
-        },
-        {
-          name: "Java",
-          href: "/quiz/java",
-        },
-        {
-          name: "Golang",
-          href: "/quiz/golang",
-        },
-      ],
     },
     {
       name: "Contact",
