@@ -17,8 +17,8 @@ export default function Home() {
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-1 lg:gap-12 items-center max-w-3xl mx-auto">
-              <div className="space-y-4 text-center">
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center max-w-6xl mx-auto">
+              <div className="space-y-4 text-center lg:text-left">
                 <div className="inline-flex items-center rounded-lg bg-blue-50 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                   <span className="mr-1">✨</span> Interactive Learning Platform
                 </div>
@@ -29,12 +29,12 @@ export default function Home() {
                   </span>{" "}
                   for Interviews
                 </h1>
-                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed lg:mx-0 mx-auto">
                   Prepare for technical interviews with our comprehensive quiz
                   platform. Test your knowledge and get AI-generated
                   explanations tailored to your learning needs.
                 </p>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
+                <div className="flex flex-col gap-2 min-[400px]:flex-row lg:justify-start justify-center">
                   <Link href="/topics">
                     <Button size="lg" className="px-8">
                       Start Learning <ArrowRight className="ml-2 h-4 w-4" />
@@ -47,11 +47,11 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="mx-auto relative">
-                <div className="relative w-full max-w-[500px] aspect-square">
+              <div className="mx-auto lg:mx-0 relative order-first lg:order-last">
+                <div className="relative w-full max-w-[500px] aspect-video md:aspect-square">
                   <Image
-                    src="/colorful-code.png"
-                    alt="Programming quiz platform"
+                    src="/real-coding-image.png"
+                    alt="Developer working on programming code"
                     fill
                     className="object-cover rounded-lg shadow-xl"
                     priority
@@ -80,36 +80,45 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
-              <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm">
-                <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
-                  <Code className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              {[
+                {
+                  icon: (
+                    <Code className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  ),
+                  title: "Diverse Question Bank",
+                  description:
+                    "Access hundreds of curated questions across multiple programming languages and difficulty levels.",
+                },
+                {
+                  icon: (
+                    <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  ),
+                  title: "AI-Powered Explanations",
+                  description:
+                    "Get detailed, AI-generated explanations for each question to deepen your understanding.",
+                },
+                {
+                  icon: (
+                    <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  ),
+                  title: "Structured Learning",
+                  description:
+                    "Progress through questions organized by topic and difficulty to build your knowledge systematically.",
+                },
+              ].map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800"
+                >
+                  <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold">{feature.title}</h3>
+                  <p className="text-center text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold">Diverse Question Bank</h3>
-                <p className="text-center text-muted-foreground">
-                  Access hundreds of curated questions across multiple
-                  programming languages and difficulty levels.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm">
-                <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
-                  <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-bold">AI-Powered Explanations</h3>
-                <p className="text-center text-muted-foreground">
-                  Get detailed, AI-generated explanations for each question to
-                  deepen your understanding.
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm">
-                <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
-                  <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-bold">Structured Learning</h3>
-                <p className="text-center text-muted-foreground">
-                  Progress through questions organized by topic and difficulty
-                  to build your knowledge systematically.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -299,150 +308,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-flex items-center rounded-lg bg-blue-50 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                  Testimonials
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  What Our Users Say
-                </h2>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Hear from developers who have improved their skills with our
-                  platform.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-12">
-              <div className="flex flex-col justify-between space-y-4 rounded-lg border p-6 shadow-sm bg-card">
-                <div className="space-y-2">
-                  <div className="flex space-x-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className="h-5 w-5 fill-current text-yellow-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground">
-                    "This platform helped me prepare for my technical interviews
-                    at top tech companies. The AI explanations were incredibly
-                    helpful!"
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-muted p-1">
-                    <div className="h-8 w-8 rounded-full bg-muted-foreground/20" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Alex Johnson</p>
-                    <p className="text-xs text-muted-foreground">
-                      Software Engineer
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col justify-between space-y-4 rounded-lg border p-6 shadow-sm bg-card">
-                <div className="space-y-2">
-                  <div className="flex space-x-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className="h-5 w-5 fill-current text-yellow-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground">
-                    "The variety of questions and detailed explanations helped
-                    me understand complex concepts that I struggled with
-                    before."
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-muted p-1">
-                    <div className="h-8 w-8 rounded-full bg-muted-foreground/20" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Sarah Chen</p>
-                    <p className="text-xs text-muted-foreground">
-                      Frontend Developer
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col justify-between space-y-4 rounded-lg border p-6 shadow-sm bg-card">
-                <div className="space-y-2">
-                  <div className="flex space-x-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className="h-5 w-5 fill-current text-yellow-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground">
-                    "As a self-taught developer, this platform filled in the
-                    gaps in my knowledge and prepared me for real-world coding
-                    challenges."
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="rounded-full bg-muted p-1">
-                    <div className="h-8 w-8 rounded-full bg-muted-foreground/20" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Michael Rodriguez</p>
-                    <p className="text-xs text-muted-foreground">
-                      Full Stack Developer
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-600 dark:bg-blue-900">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center text-white">
-              <div className="space-y-2">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center text-white">
+              <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                   Ready to Ace Your Next Interview?
                 </h2>
@@ -451,9 +321,13 @@ export default function Home() {
                   AI-powered explanations today.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <div className="flex flex-col gap-3 min-[400px]:flex-row">
                 <Link href="/topics">
-                  <Button size="lg" variant="secondary" className="px-8">
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    className="px-8 font-medium"
+                  >
                     Start Learning Now <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -461,7 +335,7 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="bg-transparent border-white text-white hover:bg-white/10 px-8"
+                    className="bg-transparent border-white text-white hover:bg-white hover:text-blue-600 px-8 font-medium"
                   >
                     Create Free Account
                   </Button>
@@ -565,7 +439,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="w-full py-6 border-t">
+      <footer className="w-full py-12 border-t">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-4">
@@ -577,58 +451,81 @@ export default function Home() {
             </div>
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Quick Links</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/" className="hover:underline">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/topics" className="hover:underline">
-                    Topics
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:underline">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
+              <nav aria-label="Footer Navigation">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>
+                    <Link
+                      href="/"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/topics"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Topics
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/contact"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Contact
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
             </div>
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Categories</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    href="/topics/web-development"
-                    className="hover:underline"
-                  >
-                    Web Development
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/topics/python" className="hover:underline">
-                    Python
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/topics/golang" className="hover:underline">
-                    Golang
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/topics/java" className="hover:underline">
-                    Java
-                  </Link>
-                </li>
-              </ul>
+              <nav aria-label="Categories Navigation">
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>
+                    <Link
+                      href="/topics/web-development"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Web Development
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/topics/python"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Python
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/topics/golang"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Golang
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/topics/java"
+                      className="hover:underline hover:text-foreground transition-colors"
+                    >
+                      Java
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
             </div>
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Connect</h3>
               <div className="flex space-x-4">
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Facebook"
                 >
                   <svg
                     className="h-6 w-6"
@@ -645,7 +542,8 @@ export default function Home() {
                 </a>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Twitter"
                 >
                   <svg
                     className="h-6 w-6"
@@ -658,7 +556,8 @@ export default function Home() {
                 </a>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="GitHub"
                 >
                   <svg
                     className="h-6 w-6"
@@ -675,7 +574,8 @@ export default function Home() {
                 </a>
               </div>
               <p className="text-sm text-muted-foreground">
-                © 2023 Programming Quiz App. All rights reserved.
+                © {new Date().getFullYear()} Programming Quiz App. All rights
+                reserved.
               </p>
             </div>
           </div>

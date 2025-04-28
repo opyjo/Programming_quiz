@@ -23,7 +23,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { Toaster } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { AnswerRating } from "@/components/answer-rating";
