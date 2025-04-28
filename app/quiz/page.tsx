@@ -63,13 +63,12 @@ function QuizContent() {
 
   const handleSubmitAnswer = async () => {
     setAnswerSubmitted(true);
-    setActiveTab("answer");
-    await generateAnswer(userAnswer); // This will now handle both evaluation and solution
+    await generateAnswer(userAnswer);
   };
 
   const handleShowSolution = async () => {
     setActiveTab("answer");
-    await generateAnswer(); // This will only generate the solution
+    await generateAnswer();
   };
 
   const handleNextQuestion = () => {
@@ -195,11 +194,11 @@ function QuizContent() {
                     className="text-sm"
                     disabled={!showAnswer && !answerSubmitted}
                   >
-                    {answerSubmitted ? "Solution" : "Answer"}
+                    {answerSubmitted ? "Your Answer" : "Solution"}
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="question" className="pt-4">
+                <div className="mt-4 space-y-4">
                   <div className="rounded-lg border p-4">
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="font-medium text-lg">
@@ -215,25 +214,25 @@ function QuizContent() {
                     </p>
                   </div>
 
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <label
-                        htmlFor="user-answer"
-                        className="block text-sm font-medium mb-2"
-                      >
-                        Your Answer
-                      </label>
-                      <Textarea
-                        id="user-answer"
-                        placeholder="Type your answer here... (supports markdown for code)"
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        className="min-h-32 font-mono text-sm"
-                        disabled={answerSubmitted}
-                      />
-                    </div>
+                  {activeTab === "question" && !answerSubmitted && (
+                    <div className="space-y-4">
+                      <div>
+                        <label
+                          htmlFor="user-answer"
+                          className="block text-sm font-medium mb-2"
+                        >
+                          Your Answer
+                        </label>
+                        <Textarea
+                          id="user-answer"
+                          placeholder="Type your answer here... (supports markdown for code)"
+                          value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          className="min-h-32 font-mono text-sm"
+                          disabled={answerSubmitted}
+                        />
+                      </div>
 
-                    {!answerSubmitted && (
                       <div className="flex justify-between">
                         <Button
                           onClick={handleSubmitAnswer}
@@ -256,82 +255,87 @@ function QuizContent() {
                           Show Solution
                         </Button>
                       </div>
-                    )}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="answer" className="pt-4">
-                  {answerSubmitted && (
-                    <>
-                      <div className="rounded-lg border p-4 mb-4 bg-blue-50 dark:bg-blue-900/20">
-                        <h4 className="font-medium mb-2">Your Submission:</h4>
-                        <div className="bg-white dark:bg-gray-800 p-3 rounded border font-mono text-sm whitespace-pre-wrap">
-                          {userAnswer}
-                        </div>
-                      </div>
-
-                      <AnswerRating
-                        score={answerEvaluation?.score || 0}
-                        feedback={answerEvaluation?.feedback || ""}
-                        isLoading={isGenerating}
-                      />
-                    </>
+                    </div>
                   )}
 
-                  <div
-                    className={cn(
-                      "rounded-lg border p-4",
-                      showAnswer
-                        ? "bg-green-50 dark:bg-green-900/20"
-                        : "bg-muted"
-                    )}
-                  >
-                    <div className="flex items-center mb-4">
-                      <Sparkles className="h-5 w-5 mr-2 text-green-600" />
-                      <h4 className="font-medium">Official Solution:</h4>
-                    </div>
-
-                    {isGenerating ? (
-                      <div className="flex items-center justify-center py-10">
-                        <Loader2 className="h-6 w-6 animate-spin" />
-                        <span className="ml-2">Generating solution...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div
-                          className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none"
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              generatedAnswer || currentQuestion.answer_text,
-                          }}
-                        />
-
-                        {resources.length > 0 && (
-                          <div className="mt-6 border-t pt-4">
+                  {(activeTab === "answer" || answerSubmitted) && (
+                    <div className="space-y-4">
+                      {answerSubmitted && (
+                        <>
+                          <div className="rounded-lg border p-4 mb-4 bg-blue-50 dark:bg-blue-900/20">
                             <h4 className="font-medium mb-2">
-                              Additional Resources:
+                              Your Submission:
                             </h4>
-                            <ul className="space-y-2">
-                              {resources.map((resource, index) => (
-                                <li key={index}>
-                                  <a
-                                    href={resource.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
-                                  >
-                                    <BookOpen className="h-4 w-4 mr-2" />
-                                    {resource.title}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="bg-white dark:bg-gray-800 p-3 rounded border font-mono text-sm whitespace-pre-wrap">
+                              {userAnswer}
+                            </div>
                           </div>
+
+                          <AnswerRating
+                            score={answerEvaluation?.score || 0}
+                            feedback={answerEvaluation?.feedback || ""}
+                            isLoading={isGenerating}
+                          />
+                        </>
+                      )}
+
+                      <div
+                        className={cn(
+                          "rounded-lg border p-4",
+                          showAnswer
+                            ? "bg-green-50 dark:bg-green-900/20"
+                            : "bg-muted"
                         )}
-                      </>
-                    )}
-                  </div>
-                </TabsContent>
+                      >
+                        <div className="flex items-center mb-4">
+                          <Sparkles className="h-5 w-5 mr-2 text-green-600" />
+                          <h4 className="font-medium">Official Solution:</h4>
+                        </div>
+
+                        {isGenerating ? (
+                          <div className="flex items-center justify-center py-10">
+                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <span className="ml-2">Generating solution...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <div
+                              className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none"
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  generatedAnswer ||
+                                  currentQuestion.answer_text,
+                              }}
+                            />
+
+                            {resources.length > 0 && (
+                              <div className="mt-6 border-t pt-4">
+                                <h4 className="font-medium mb-2">
+                                  Additional Resources:
+                                </h4>
+                                <ul className="space-y-2">
+                                  {resources.map((resource, index) => (
+                                    <li key={index}>
+                                      <a
+                                        href={resource.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+                                      >
+                                        <BookOpen className="h-4 w-4 mr-2" />
+                                        {resource.title}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </Tabs>
             </div>
           )}
