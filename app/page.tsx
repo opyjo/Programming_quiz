@@ -184,7 +184,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mt-12">
-              <Link href="/quiz/web-development">
+              <Link href="/quiz">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -212,7 +212,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz/python">
+              <Link href="/quiz">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -239,7 +239,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz/golang">
+              <Link href="/quiz">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -269,7 +269,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz/java">
+              <Link href="/quiz">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -599,25 +599,22 @@ export default function Home() {
               <h3 className="text-lg font-medium">Categories</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link
-                    href="/quiz/web-development"
-                    className="hover:underline"
-                  >
+                  <Link href="/quiz" className="hover:underline">
                     Web Development
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz/python" className="hover:underline">
+                  <Link href="/quiz" className="hover:underline">
                     Python
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz/golang" className="hover:underline">
+                  <Link href="/quiz" className="hover:underline">
                     Golang
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz/java" className="hover:underline">
+                  <Link href="/quiz" className="hover:underline">
                     Java
                   </Link>
                 </li>
