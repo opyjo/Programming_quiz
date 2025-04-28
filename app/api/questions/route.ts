@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const lastQuestionId = searchParams.get("lastQuestionId");
 
   try {
-    let query = supabase.from("interview_questions").select("*");
+    let query = supabase.from("web_development").select("*");
 
     if (category) {
       query = query.eq("category", category);
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     } else if (lastQuestionId) {
       // For sequential fetching, get the next question after the last one
       const { data: lastQuestion } = await supabase
-        .from("interview_questions")
+        .from("web_development")
         .select("created_at")
         .eq("id", lastQuestionId)
         .single();
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
       if (lastQuestionId && !random) {
         const { data: firstQuestion, error: firstQuestionError } =
           await supabase
-            .from("interview_questions")
+            .from("web_development")
             .select("*")
             .eq(category ? "category" : "id", category || "id")
             .order("created_at")
