@@ -22,7 +22,7 @@ class QuizService {
 
       // First, count total questions for this category
       const { count } = await this.supabase
-        .from("interview_questions")
+        .from("web_development")
         .select("*", { count: "exact", head: true })
         .eq("category", category);
 
@@ -33,7 +33,7 @@ class QuizService {
 
       // Build the query
       let query = this.supabase
-        .from("interview_questions")
+        .from("web_development")
         .select("*")
         .eq("category", category)
         .limit(1)
@@ -58,7 +58,7 @@ class QuizService {
       ) {
         const newOffset = (randomOffset + 1) % count;
         const { data: retryData, error: retryError } = await this.supabase
-          .from("interview_questions")
+          .from("web_development")
           .select("*")
           .eq("category", category)
           .limit(1)
@@ -83,7 +83,7 @@ class QuizService {
       // If no current question, get the first question
       if (!currentQuestionId) {
         const { data, error } = await this.supabase
-          .from("interview_questions")
+          .from("web_development")
           .select("*")
           .eq("category", category)
           .order("created_at", { ascending: true })
@@ -95,7 +95,7 @@ class QuizService {
 
       // Get all questions for the category ordered by created_at
       const { data: allQuestions, error: allError } = await this.supabase
-        .from("interview_questions")
+        .from("web_development")
         .select("*")
         .eq("category", category)
         .order("created_at", { ascending: true });
