@@ -5,6 +5,16 @@ import { QuestionCategory } from "@/utils/supabase";
 import { Question, quizService } from "@/lib/services/quiz-service";
 import { toast } from "sonner";
 
+interface AnswerEvaluation {
+  score: number;
+  feedback: string;
+}
+
+interface Resource {
+  title: string;
+  url: string;
+}
+
 interface QuizContextType {
   selectedCategory: QuestionCategory | null;
   currentQuestion: Question | null;
@@ -12,10 +22,12 @@ interface QuizContextType {
   isLoading: boolean;
   isGenerating: boolean;
   generatedAnswer: string | null;
+  answerEvaluation: AnswerEvaluation | null;
+  resources: Resource[];
   setSelectedCategory: (category: QuestionCategory | null) => void;
   setShowAnswer: (show: boolean) => void;
   fetchQuestion: (random: boolean) => Promise<void>;
-  generateAnswer: () => Promise<void>;
+  generateAnswer: (userAnswer?: string) => Promise<void>;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -28,8 +40,11 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAnswer, setGeneratedAnswer] = useState<string | null>(null);
+  const [answerEvaluation, setAnswerEvaluation] =
+    useState<AnswerEvaluation | null>(null);
+  const [resources, setResources] = useState<Resource[]>([]);
 
-  const generateAnswer = async () => {
+  const generateAnswer = async (userAnswer?: string) => {
     if (!currentQuestion || !selectedCategory) return;
 
     setIsGenerating(true);
@@ -43,6 +58,7 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
           question: currentQuestion.question_text,
           category: selectedCategory,
           difficulty: currentQuestion.difficulty,
+          userAnswer,
         }),
       });
 
@@ -51,7 +67,17 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
       }
 
       const data = await response.json();
+
+      if (userAnswer) {
+        // If userAnswer was provided, we'll get back both evaluation and answer
+        setAnswerEvaluation({
+          score: data.score,
+          feedback: data.feedback,
+        });
+      }
+
       setGeneratedAnswer(data.answer);
+      setResources(data.resources || []);
       setShowAnswer(true);
     } catch (error) {
       console.error("Error generating answer:", error);
@@ -94,6 +120,8 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
       setCurrentQuestion(question);
       setShowAnswer(false);
       setGeneratedAnswer(null);
+      setAnswerEvaluation(null);
+      setResources([]);
     } catch (error) {
       console.error("Error fetching question:", error);
       toast.error("Failed to fetch question. Please try again.");
@@ -109,6 +137,8 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     isGenerating,
     generatedAnswer,
+    answerEvaluation,
+    resources,
     setSelectedCategory,
     setShowAnswer,
     fetchQuestion,

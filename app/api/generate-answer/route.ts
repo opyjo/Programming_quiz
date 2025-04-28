@@ -1,59 +1,108 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { OpenAI } from "openai"
+import { OpenAIStream } from "@/lib/openai";
+import { QuestionCategory } from "@/utils/supabase";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+export const runtime = "edge";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { question, category, difficulty } = await request.json()
+    const { question, category, difficulty, userAnswer } = await req.json();
 
-    if (!question) {
-      return NextResponse.json({ error: "Question is required" }, { status: 400 })
+    if (!question || !category || !difficulty) {
+      return new Response(
+        JSON.stringify({
+          error: "Missing required fields",
+        }),
+        { status: 400 }
+      );
     }
 
-    // Create a prompt for the OpenAI API
-    const prompt = `
-      You are an expert programming tutor specializing in ${category}.
-      
-      Please provide a clear, concise answer to the following ${difficulty.toLowerCase()}-level programming question:
-      
-      "${question}"
-      
-      Your answer should:
-      1. Be appropriate for a ${difficulty.toLowerCase()}-level programmer
-      2. Include code examples where relevant
-      3. Explain key concepts clearly
-      4. Include 1-2 relevant documentation links at the end if applicable
-      
-      Format your response using HTML for better readability (use <p>, <code>, <pre>, <strong>, <ul>, <li> tags as needed).
-    `
+    // If userAnswer is provided, generate both evaluation and solution
+    const prompt = userAnswer
+      ? `You are an expert programming instructor evaluating a student's answer to a ${category} question.
 
-    // Call the OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful programming tutor that provides clear, concise answers to programming questions.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
-    })
+Question (${difficulty}): ${question}
 
-    // Extract the generated answer
-    const answer = completion.choices[0].message.content
+Student's Answer: ${userAnswer}
 
-    return NextResponse.json({ answer })
-  } catch (error) {
-    console.error("Error generating answer:", error)
-    return NextResponse.json({ error: "Failed to generate answer" }, { status: 500 })
+Please provide:
+1. An evaluation of the student's answer (score between 0 and 1 and feedback)
+2. A detailed explanation of the correct solution
+3. At least 2 relevant documentation links or resources for further learning
+
+Format your response as valid JSON with the following structure:
+{
+  "score": 0.8,
+  "feedback": "Great explanation of X. Consider adding Y for completeness.",
+  "answer": "Detailed solution with HTML formatting...",
+  "resources": [
+    {
+      "title": "Official Documentation",
+      "url": "https://example.com/docs"
+    },
+    {
+      "title": "Additional Resource",
+      "url": "https://example.com/tutorial"
+    }
+  ]
+}
+
+Make the answer part well-formatted using HTML tags (<p>, <code>, <pre>, <strong>, <ul>, <li> tags as needed).`
+      : `You are an expert programming tutor specializing in ${category}.
+      
+Please provide a clear, concise answer to the following ${difficulty.toLowerCase()}-level programming question:
+
+"${question}"
+
+Your answer should:
+1. Be appropriate for a ${difficulty.toLowerCase()}-level programmer
+2. Include code examples where relevant
+3. Explain key concepts clearly
+4. Include at least 2 relevant documentation links or resources
+
+Format your response as valid JSON with the following structure:
+{
+  "answer": "Detailed solution with HTML formatting...",
+  "resources": [
+    {
+      "title": "Official Documentation",
+      "url": "https://example.com/docs"
+    },
+    {
+      "title": "Additional Resource",
+      "url": "https://example.com/tutorial"
+    }
+  ]
+}
+
+Use HTML tags for better readability (<p>, <code>, <pre>, <strong>, <ul>, <li> tags as needed).`;
+
+    try {
+      const response = await OpenAIStream(prompt);
+      const result = JSON.parse(response);
+
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (parseError: unknown) {
+      const error = parseError as Error;
+      console.error("OpenAI response parsing error:", error);
+      return new Response(
+        JSON.stringify({
+          error: "Invalid response format from OpenAI",
+          details: error.message,
+        }),
+        { status: 500 }
+      );
+    }
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error("Error in generate-answer:", err);
+    return new Response(
+      JSON.stringify({
+        error: "Failed to process request",
+        details: err.message,
+      }),
+      { status: 500 }
+    );
   }
 }
