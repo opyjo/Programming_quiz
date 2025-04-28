@@ -28,7 +28,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { AnswerRating } from "@/components/answer-rating";
 
-function QuizContent() {
+// Define framework-specific categories
+type FrameworkQuestionCategory =
+  | "React"
+  | "Vue"
+  | "Angular"
+  | "Next.js"
+  | "Nuxt"
+  | "Svelte"
+  | QuestionCategory;
+
+function JSFrameworksContent() {
   const {
     selectedCategory,
     currentQuestion,
@@ -44,21 +54,17 @@ function QuizContent() {
     generateAnswer,
   } = useQuiz();
 
-  // New state for user answer
   const [userAnswer, setUserAnswer] = useState("");
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState("question");
 
-  const categories: QuestionCategory[] = [
-    "HTML",
-    "CSS",
-    "JavaScript",
+  const categories: FrameworkQuestionCategory[] = [
     "React",
-    "TypeScript",
-    "Accessibility",
-    "Performance",
-    "Security",
-    "General",
+    "Vue",
+    "Angular",
+    "Next.js",
+    "Nuxt",
+    "Svelte",
   ];
 
   const handleSubmitAnswer = async () => {
@@ -100,10 +106,11 @@ function QuizContent() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-xl md:text-2xl">
-                Programming Quiz
+                JavaScript Frameworks Quiz
               </CardTitle>
               <CardDescription className="text-sm md:text-base">
-                Test your programming knowledge with our interactive quiz
+                Test your knowledge of popular JavaScript frameworks and
+                libraries
               </CardDescription>
             </div>
             {selectedCategory && (
@@ -128,7 +135,7 @@ function QuizContent() {
         <CardContent>
           {!selectedCategory ? (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Select a Category</h3>
+              <h3 className="text-lg font-medium">Select a Framework</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {categories.map((category) => (
                   <Button
@@ -373,12 +380,12 @@ function QuizContent() {
   );
 }
 
-export default function QuizPage() {
+export default function JSFrameworksPage() {
   return (
     <ProtectedRoute>
       <div className="container py-8">
         <QuizProvider>
-          <QuizContent />
+          <JSFrameworksContent />
         </QuizProvider>
         <Toaster />
       </div>

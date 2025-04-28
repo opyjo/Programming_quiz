@@ -124,13 +124,36 @@ export function SiteHeader() {
       active: pathname === "/",
     },
     {
-      name: "Quiz",
-      href: "/quiz",
+      name: "Topics",
+      href: "/topics",
       icon: <Menu className="h-4 w-4" />,
-      color: "text-green-500 dark:text-green-400",
-      bgColor: "bg-green-100 dark:bg-green-900/20",
-      hoverColor: "hover:text-green-600 dark:hover:text-green-300",
-      active: pathname.startsWith("/quiz"),
+      color: "text-purple-500 dark:text-purple-400",
+      bgColor: "bg-purple-100 dark:bg-purple-900/20",
+      hoverColor: "hover:text-purple-600 dark:hover:text-purple-300",
+      active: pathname.startsWith("/topics"),
+      dropdown: true,
+      items: [
+        {
+          name: "Web Development",
+          href: "/topics/web-development",
+        },
+        {
+          name: "JavaScript Frameworks",
+          href: "/topics/javascript-frameworks",
+        },
+        {
+          name: "Java",
+          href: "/topics/java",
+        },
+        {
+          name: "Python",
+          href: "/topics/python",
+        },
+        {
+          name: "Golang",
+          href: "/topics/golang",
+        },
+      ],
     },
     {
       name: "Contact",
