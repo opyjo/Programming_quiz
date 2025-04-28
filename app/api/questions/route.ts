@@ -1,14 +1,45 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase";
+import { QuestionCategory } from "@/utils/supabase";
+
+function getTableName(category: QuestionCategory): string {
+  const tableMap: Record<QuestionCategory, string> = {
+    React: "react_questions",
+    Vue: "vue_questions",
+    Angular: "angular_questions",
+    "Next.js": "nextjs_questions",
+    Nuxt: "nuxt_questions",
+    Svelte: "svelte_questions",
+    HTML: "web_development",
+    CSS: "web_development",
+    JavaScript: "web_development",
+    TypeScript: "web_development",
+    Accessibility: "web_development",
+    Performance: "web_development",
+    Security: "web_development",
+    General: "web_development",
+  };
+
+  return tableMap[category];
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const category = searchParams.get("category");
+  const category = searchParams.get("category") as QuestionCategory;
   const random = searchParams.get("random") === "true";
   const lastQuestionId = searchParams.get("lastQuestionId");
 
+  if (!category) {
+    return NextResponse.json(
+      { error: "Category is required" },
+      { status: 400 }
+    );
+  }
+
+  const tableName = getTableName(category);
+
   try {
-    let query = supabase.from("web_development").select("*");
+    let query = supabase.from(tableName).select("*");
 
     if (category) {
       query = query.eq("category", category);
@@ -20,7 +51,7 @@ export async function GET(request: Request) {
     } else if (lastQuestionId) {
       // For sequential fetching, get the next question after the last one
       const { data: lastQuestion } = await supabase
-        .from("web_development")
+        .from(tableName)
         .select("created_at")
         .eq("id", lastQuestionId)
         .single();
@@ -51,7 +82,7 @@ export async function GET(request: Request) {
       if (lastQuestionId && !random) {
         const { data: firstQuestion, error: firstQuestionError } =
           await supabase
-            .from("web_development")
+            .from(tableName)
             .select("*")
             .eq(category ? "category" : "id", category || "id")
             .order("created_at")

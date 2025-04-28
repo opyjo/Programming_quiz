@@ -13,18 +13,54 @@ export interface Question {
 class QuizService {
   private supabase = createClient();
 
+  private getTableName(category: QuestionCategory): string {
+    // Map categories to their respective tables
+    const tableMap: Record<QuestionCategory, string> = {
+      React: "react_questions",
+      Vue: "vue_questions",
+      Angular: "angular_questions",
+      "Next.js": "nextjs_questions",
+      Nuxt: "nuxt_questions",
+      Svelte: "svelte_questions",
+      HTML: "web_development",
+      CSS: "web_development",
+      JavaScript: "web_development",
+      TypeScript: "web_development",
+      Accessibility: "web_development",
+      Performance: "web_development",
+      Security: "web_development",
+      General: "web_development",
+    };
+
+    return tableMap[category];
+  }
+
+  private isFrameworkCategory(category: QuestionCategory): boolean {
+    return ["React", "Vue", "Angular", "Next.js", "Nuxt", "Svelte"].includes(
+      category
+    );
+  }
+
   async getRandomQuestion(
     category: QuestionCategory,
     currentQuestionId?: string
   ): Promise<Question | null> {
     try {
       console.log("Fetching random question for category:", category);
+      const tableName = this.getTableName(category);
+      const isFramework = this.isFrameworkCategory(category);
 
-      // First, count total questions for this category
-      const { count } = await this.supabase
-        .from("web_development")
-        .select("*", { count: "exact", head: true })
-        .eq("category", category);
+      // First, count total questions
+      let countQuery = this.supabase
+        .from(tableName)
+        .select("*", { count: "exact", head: true });
+
+      // Only apply category filter for non-framework tables
+      if (!isFramework) {
+        countQuery = countQuery.eq("category", category);
+      }
+
+      const { count } = await countQuery;
 
       if (!count) return null;
 
@@ -33,11 +69,15 @@ class QuizService {
 
       // Build the query
       let query = this.supabase
-        .from("web_development")
+        .from(tableName)
         .select("*")
-        .eq("category", category)
         .limit(1)
         .range(randomOffset, randomOffset);
+
+      // Only apply category filter for non-framework tables
+      if (!isFramework) {
+        query = query.eq("category", category);
+      }
 
       // Only add the neq condition if we have a current question ID
       if (currentQuestionId) {
@@ -57,12 +97,18 @@ class QuizService {
         (currentQuestionId && data[0].id === currentQuestionId)
       ) {
         const newOffset = (randomOffset + 1) % count;
-        const { data: retryData, error: retryError } = await this.supabase
-          .from("web_development")
+        let retryQuery = this.supabase
+          .from(tableName)
           .select("*")
-          .eq("category", category)
           .limit(1)
           .range(newOffset, newOffset);
+
+        // Only apply category filter for non-framework tables
+        if (!isFramework) {
+          retryQuery = retryQuery.eq("category", category);
+        }
+
+        const { data: retryData, error: retryError } = await retryQuery;
 
         if (retryError) throw retryError;
         return retryData?.[0] || null;
@@ -80,25 +126,40 @@ class QuizService {
     currentQuestionId?: string
   ): Promise<Question | null> {
     try {
+      const tableName = this.getTableName(category);
+      const isFramework = this.isFrameworkCategory(category);
+
       // If no current question, get the first question
       if (!currentQuestionId) {
-        const { data, error } = await this.supabase
-          .from("web_development")
+        let query = this.supabase
+          .from(tableName)
           .select("*")
-          .eq("category", category)
           .order("created_at", { ascending: true })
           .limit(1);
+
+        // Only apply category filter for non-framework tables
+        if (!isFramework) {
+          query = query.eq("category", category);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         return data?.[0] || null;
       }
 
-      // Get all questions for the category ordered by created_at
-      const { data: allQuestions, error: allError } = await this.supabase
-        .from("web_development")
+      // Get all questions ordered by created_at
+      let query = this.supabase
+        .from(tableName)
         .select("*")
-        .eq("category", category)
         .order("created_at", { ascending: true });
+
+      // Only apply category filter for non-framework tables
+      if (!isFramework) {
+        query = query.eq("category", category);
+      }
+
+      const { data: allQuestions, error: allError } = await query;
 
       if (allError) throw allError;
       if (!allQuestions?.length) return null;
