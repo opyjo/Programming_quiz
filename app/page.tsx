@@ -35,7 +35,7 @@ export default function Home() {
                   explanations tailored to your learning needs.
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                  <Link href="/quiz">
+                  <Link href="/topics">
                     <Button size="lg" className="px-8">
                       Start Learning <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -184,7 +184,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mt-12">
-              <Link href="/quiz">
+              <Link href="/topics/web-development">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -212,7 +212,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz">
+              <Link href="/topics/python">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -239,7 +239,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz">
+              <Link href="/topics/golang">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -269,7 +269,7 @@ export default function Home() {
                   </p>
                 </div>
               </Link>
-              <Link href="/quiz">
+              <Link href="/topics/java">
                 <div className="group flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800">
                   <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/30 transition-colors">
                     <svg
@@ -452,7 +452,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/quiz">
+                <Link href="/topics">
                   <Button size="lg" variant="secondary" className="px-8">
                     Start Learning Now <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -584,8 +584,8 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz" className="hover:underline">
-                    Quiz Categories
+                  <Link href="/topics" className="hover:underline">
+                    Topics
                   </Link>
                 </li>
                 <li>
@@ -599,22 +599,25 @@ export default function Home() {
               <h3 className="text-lg font-medium">Categories</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/quiz" className="hover:underline">
+                  <Link
+                    href="/topics/web-development"
+                    className="hover:underline"
+                  >
                     Web Development
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz" className="hover:underline">
+                  <Link href="/topics/python" className="hover:underline">
                     Python
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz" className="hover:underline">
+                  <Link href="/topics/golang" className="hover:underline">
                     Golang
                   </Link>
                 </li>
                 <li>
-                  <Link href="/quiz" className="hover:underline">
+                  <Link href="/topics/java" className="hover:underline">
                     Java
                   </Link>
                 </li>
