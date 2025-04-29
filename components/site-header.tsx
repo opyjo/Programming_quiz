@@ -3,7 +3,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Frame, User, LogOut, Menu, ChevronDown, X, Mail } from "lucide-react";
+import {
+  Frame,
+  User,
+  LogOut,
+  Menu,
+  ChevronDown,
+  X,
+  Mail,
+  BarChart,
+  Bookmark,
+} from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -124,6 +134,15 @@ export function SiteHeader() {
       active: pathname === "/",
     },
     {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <BarChart className="h-4 w-4" />,
+      color: "text-green-500 dark:text-green-400",
+      bgColor: "bg-green-100 dark:bg-green-900/20",
+      hoverColor: "hover:text-green-600 dark:hover:text-green-300",
+      active: pathname === "/dashboard",
+    },
+    {
       name: "Topics",
       href: "/topics",
       icon: <Menu className="h-4 w-4" />,
@@ -154,6 +173,15 @@ export function SiteHeader() {
           href: "/topics/golang",
         },
       ],
+    },
+    {
+      name: "Bookmarks",
+      href: "/bookmarks",
+      icon: <Bookmark className="h-4 w-4" />,
+      color: "text-amber-500 dark:text-amber-400",
+      bgColor: "bg-amber-100 dark:bg-amber-900/20",
+      hoverColor: "hover:text-amber-600 dark:hover:text-amber-300",
+      active: pathname === "/bookmarks",
     },
     {
       name: "Contact",
