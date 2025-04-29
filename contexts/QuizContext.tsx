@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { QuestionCategory } from "@/utils/supabase";
 import { Question, quizService } from "@/lib/services/quiz-service";
 import { toast } from "sonner";
+import { dashboardService } from "@/lib/services/dashboard-service";
 
 interface AnswerEvaluation {
   score: number;
@@ -43,6 +44,31 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
   const [answerEvaluation, setAnswerEvaluation] =
     useState<AnswerEvaluation | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [currentStudySession, setCurrentStudySession] = useState<string | null>(
+    null
+  );
+
+  // Start a study session when selecting a category
+  useEffect(() => {
+    async function startSession() {
+      if (selectedCategory && !currentStudySession) {
+        const sessionId = await dashboardService.startStudySession(
+          selectedCategory
+        );
+        setCurrentStudySession(sessionId);
+      }
+    }
+    startSession();
+  }, [selectedCategory]);
+
+  // End study session when changing category or unmounting
+  useEffect(() => {
+    return () => {
+      if (currentStudySession) {
+        dashboardService.endStudySession(currentStudySession);
+      }
+    };
+  }, [currentStudySession]);
 
   const generateAnswer = async (userAnswer?: string) => {
     if (!currentQuestion || !selectedCategory) return;
@@ -69,9 +95,12 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
 
       if (userAnswer) {
-        // If userAnswer was provided, we'll get back both evaluation and answer
+        // Update progress when user submits an answer
+        const score = data.score || 0;
+        await dashboardService.updateProgress(selectedCategory, score >= 0.7);
+
         setAnswerEvaluation({
-          score: data.score,
+          score: score,
           feedback: data.feedback,
         });
       }
