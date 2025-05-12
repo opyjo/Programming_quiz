@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import ProtectedRoute from "@/components/protected-route";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -371,14 +372,27 @@ function WebDevContent() {
 }
 
 export default function WebDevPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace(
+        "/auth/sign-in?redirect=" + encodeURIComponent(window.location.pathname)
+      );
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading || !isAuthenticated) {
+    return null;
+  }
+
   return (
-    <ProtectedRoute>
-      <div className="container py-8">
-        <QuizProvider>
-          <WebDevContent />
-        </QuizProvider>
-        <Toaster />
-      </div>
-    </ProtectedRoute>
+    <div className="container py-8">
+      <QuizProvider>
+        <WebDevContent />
+      </QuizProvider>
+      <Toaster />
+    </div>
   );
 }
