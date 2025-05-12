@@ -78,7 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             provider: session.user.app_metadata.provider,
           });
           // Redirect to home page on successful sign in
-          if (event === "SIGNED_IN") {
+          if (
+            event === "SIGNED_IN" &&
+            ["/auth/sign-in", "/auth/sign-up"].includes(
+              window.location.pathname
+            )
+          ) {
             router.push("/");
           }
         } else {

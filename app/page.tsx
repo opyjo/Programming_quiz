@@ -40,11 +40,6 @@ export default function Home() {
                       Start Learning <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link href="/resources">
-                    <Button size="lg" variant="outline">
-                      Explore Resources
-                    </Button>
-                  </Link>
                 </div>
               </div>
               <div className="mx-auto lg:mx-0 relative order-first lg:order-last">
