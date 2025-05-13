@@ -22,6 +22,8 @@ import {
   Loader2,
   Sparkles,
   BookOpen,
+  Star,
+  StarOff,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -53,6 +55,12 @@ function JSFrameworksContent() {
     setShowAnswer,
     fetchQuestion,
     generateAnswer,
+    questionHistory,
+    currentQuestionIndex,
+    goToPreviousQuestion,
+    goToNextQuestion,
+    isBookmarked,
+    toggleBookmark,
   } = useQuiz();
 
   const [userAnswer, setUserAnswer] = useState("");
@@ -213,9 +221,40 @@ function JSFrameworksContent() {
                         <Code className="inline h-5 w-5 mr-2 text-blue-600" />
                         Question:
                       </h4>
-                      <span className="text-sm px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                        {currentQuestion.difficulty}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          {currentQuestion.difficulty}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label={
+                            isBookmarked(currentQuestion.id)
+                              ? "Remove bookmark"
+                              : "Bookmark question"
+                          }
+                          tabIndex={0}
+                          onClick={() =>
+                            toggleBookmark(
+                              currentQuestion.id,
+                              currentQuestion.category
+                            )
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ")
+                              toggleBookmark(
+                                currentQuestion.id,
+                                currentQuestion.category
+                              );
+                          }}
+                          className="ml-2 p-1 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        >
+                          {isBookmarked(currentQuestion.id) ? (
+                            <Star className="h-5 w-5 text-yellow-500 fill-yellow-400" />
+                          ) : (
+                            <StarOff className="h-5 w-5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <p className="text-muted-foreground">
                       {currentQuestion.question_text}
@@ -350,13 +389,38 @@ function JSFrameworksContent() {
         </CardContent>
 
         {selectedCategory && currentQuestion && showAnswer && (
-          <CardFooter className="flex justify-between pt-2 border-t">
+          <CardFooter className="flex flex-col gap-2 pt-2 border-t">
+            <div className="flex gap-3 justify-between w-full">
+              <Button
+                onClick={goToPreviousQuestion}
+                disabled={
+                  isLoading || isGenerating || currentQuestionIndex <= 0
+                }
+                variant="outline"
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                Question {currentQuestionIndex + 1} of {questionHistory.length}
+              </div>
+              <Button
+                onClick={goToNextQuestion}
+                disabled={
+                  isLoading ||
+                  isGenerating ||
+                  currentQuestionIndex >= questionHistory.length - 1
+                }
+                variant="outline"
+              >
+                Next
+              </Button>
+            </div>
             <div className="flex gap-3">
               <Button
                 onClick={handleNextQuestion}
                 disabled={isLoading || isGenerating}
               >
-                Next Question
+                New Sequential
               </Button>
               <Button
                 onClick={handleRandomQuestion}
@@ -365,15 +429,15 @@ function JSFrameworksContent() {
               >
                 Random Question
               </Button>
+              <Button
+                variant="ghost"
+                onClick={handleStartOver}
+                disabled={isLoading || isGenerating}
+                className="text-sm"
+              >
+                Start Over
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              onClick={handleStartOver}
-              disabled={isLoading || isGenerating}
-              className="text-sm"
-            >
-              Start Over
-            </Button>
           </CardFooter>
         )}
       </Card>

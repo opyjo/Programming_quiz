@@ -5,6 +5,8 @@ import { QuestionCategory } from "@/utils/supabase";
 import { Question, quizService } from "@/lib/services/quiz-service";
 import { toast } from "sonner";
 import { dashboardService } from "@/lib/services/dashboard-service";
+import { useAuth } from "@/context/auth-context";
+import { useSupabase } from "@/lib/supabase/supabase-provider";
 
 interface AnswerEvaluation {
   score: number;
@@ -16,6 +18,15 @@ interface Resource {
   url: string;
 }
 
+interface QuestionHistoryEntry {
+  question: Question;
+  userAnswer: string;
+  evaluation: AnswerEvaluation | null;
+  generatedAnswer: string | null;
+  resources: Resource[];
+  bookmarked?: boolean;
+}
+
 interface QuizContextType {
   selectedCategory: QuestionCategory | null;
   currentQuestion: Question | null;
@@ -25,10 +36,21 @@ interface QuizContextType {
   generatedAnswer: string | null;
   answerEvaluation: AnswerEvaluation | null;
   resources: Resource[];
+  questionHistory: QuestionHistoryEntry[];
+  currentQuestionIndex: number;
+  goToPreviousQuestion: () => void;
+  goToNextQuestion: () => void;
+  jumpToQuestion: (index: number) => void;
   setSelectedCategory: (category: QuestionCategory | null) => void;
   setShowAnswer: (show: boolean) => void;
   fetchQuestion: (random: boolean) => Promise<void>;
   generateAnswer: (userAnswer?: string) => Promise<void>;
+  bookmarkedQuestionIds: string[];
+  isBookmarked: (questionId: string) => boolean;
+  toggleBookmark: (
+    questionId: string,
+    category: QuestionCategory
+  ) => Promise<void>;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -46,6 +68,15 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [currentStudySession, setCurrentStudySession] = useState<string | null>(
     null
+  );
+  const [questionHistory, setQuestionHistory] = useState<
+    QuestionHistoryEntry[]
+  >([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(-1);
+  const { user } = useAuth();
+  const { supabase } = useSupabase();
+  const [bookmarkedQuestionIds, setBookmarkedQuestionIds] = useState<string[]>(
+    []
   );
 
   // Start a study session when selecting a category
@@ -69,6 +100,57 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
       }
     };
   }, [currentStudySession]);
+
+  // Fetch bookmarks for the user on mount or when user changes
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      if (!user) {
+        setBookmarkedQuestionIds([]);
+        return;
+      }
+      const { data, error } = await supabase
+        .from("bookmarks")
+        .select("question_id")
+        .eq("user_id", user.id);
+      if (!error && data) {
+        setBookmarkedQuestionIds(
+          data.map((b: { question_id: string }) => b.question_id)
+        );
+      }
+    };
+    fetchBookmarks();
+  }, [user, supabase]);
+
+  const isBookmarked = (questionId: string) =>
+    bookmarkedQuestionIds.includes(questionId);
+
+  const toggleBookmark = async (
+    questionId: string,
+    category: QuestionCategory
+  ) => {
+    if (!user) return;
+    if (isBookmarked(questionId)) {
+      // Remove bookmark
+      const { error } = await supabase
+        .from("bookmarks")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("question_id", questionId);
+      if (!error) {
+        setBookmarkedQuestionIds((prev) =>
+          prev.filter((id) => id !== questionId)
+        );
+      }
+    } else {
+      // Add bookmark
+      const { error } = await supabase
+        .from("bookmarks")
+        .insert([{ user_id: user.id, question_id: questionId, category }]);
+      if (!error) {
+        setBookmarkedQuestionIds((prev) => [...prev, questionId]);
+      }
+    }
+  };
 
   const generateAnswer = async (userAnswer?: string) => {
     if (!currentQuestion || !selectedCategory) return;
@@ -94,20 +176,33 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
 
+      let evaluation: AnswerEvaluation | null = null;
       if (userAnswer) {
         // Update progress when user submits an answer
         const score = data.score || 0;
         await dashboardService.updateProgress(selectedCategory, score >= 0.7);
-
-        setAnswerEvaluation({
-          score: score,
-          feedback: data.feedback,
-        });
+        evaluation = { score: score, feedback: data.feedback };
+        setAnswerEvaluation(evaluation);
       }
 
       setGeneratedAnswer(data.answer);
       setResources(data.resources || []);
       setShowAnswer(true);
+
+      // Update history entry
+      setQuestionHistory((prev) => {
+        if (currentQuestionIndex < 0 || currentQuestionIndex >= prev.length)
+          return prev;
+        const updated = [...prev];
+        updated[currentQuestionIndex] = {
+          ...updated[currentQuestionIndex],
+          userAnswer: userAnswer || updated[currentQuestionIndex].userAnswer,
+          evaluation: evaluation || updated[currentQuestionIndex].evaluation,
+          generatedAnswer: data.answer,
+          resources: data.resources || [],
+        };
+        return updated;
+      });
     } catch (error) {
       console.error("Error generating answer:", error);
       toast.error("Failed to generate answer. Please try again.");
@@ -146,6 +241,20 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Add to history
+      const newEntry: QuestionHistoryEntry = {
+        question,
+        userAnswer: "",
+        evaluation: null,
+        generatedAnswer: null,
+        resources: [],
+      };
+      setQuestionHistory((prev) => [
+        ...prev.slice(0, currentQuestionIndex + 1),
+        newEntry,
+      ]);
+      setCurrentQuestionIndex((prev) => prev + 1);
+
       setCurrentQuestion(question);
       setShowAnswer(false);
       setGeneratedAnswer(null);
@@ -159,6 +268,42 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Navigation functions
+  const goToPreviousQuestion = () => {
+    setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
+  };
+  const goToNextQuestion = () => {
+    setCurrentQuestionIndex((prev) =>
+      Math.min(questionHistory.length - 1, prev + 1)
+    );
+  };
+  const jumpToQuestion = (index: number) => {
+    if (index >= 0 && index < questionHistory.length) {
+      setCurrentQuestionIndex(index);
+    }
+  };
+
+  // Sync currentQuestion and related state with history navigation
+  useEffect(() => {
+    if (
+      currentQuestionIndex >= 0 &&
+      currentQuestionIndex < questionHistory.length
+    ) {
+      const entry = questionHistory[currentQuestionIndex];
+      setCurrentQuestion(entry.question);
+      setGeneratedAnswer(entry.generatedAnswer);
+      setAnswerEvaluation(entry.evaluation);
+      setResources(entry.resources);
+      setShowAnswer(!!entry.generatedAnswer);
+    }
+  }, [currentQuestionIndex, questionHistory]);
+
+  // When category changes, reset history
+  useEffect(() => {
+    setQuestionHistory([]);
+    setCurrentQuestionIndex(-1);
+  }, [selectedCategory]);
+
   const value = {
     selectedCategory,
     currentQuestion,
@@ -168,10 +313,18 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     generatedAnswer,
     answerEvaluation,
     resources,
+    questionHistory,
+    currentQuestionIndex,
+    goToPreviousQuestion,
+    goToNextQuestion,
+    jumpToQuestion,
     setSelectedCategory,
     setShowAnswer,
     fetchQuestion,
     generateAnswer,
+    bookmarkedQuestionIds,
+    isBookmarked,
+    toggleBookmark,
   };
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>;
